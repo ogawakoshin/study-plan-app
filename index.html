@@ -1,0 +1,920 @@
+                    <!-- 得点効率ランキング -->
+                    <div class="glass-effect rounded-2xl shadow-2xl p-6 mb-8 card-hover">
+                        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
+                            <div class="w-10 <!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>応用情報技術者試験 学習計画ダッシュボード</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .button-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            transition: all 0.2s ease;
+        }
+        
+        .button-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+        }
+        
+        .button-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .button-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(10px);
+        }
+        
+        .table-modern {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .timer-display {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #64ffda;
+            font-family: 'Monaco', 'Menlo', monospace;
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+        
+        .priority-high {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+        
+        .priority-medium {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1px solid #fcd34d;
+            color: #92400e;
+        }
+        
+        .priority-low {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #86efac;
+            color: #166534;
+        }
+        
+        .animate-pulse-soft {
+            animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse-soft {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        
+        .subject-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .subject-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #06d6a0 100%);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg">
+    <div id="app"></div>
+
+    <script>
+        // 現在の日付を2024年7月25日として設定
+        const getCurrentDate = () => new Date('2024-07-25');
+        const getExamDate = () => new Date('2024-10-12');
+        const getStudyEndDate = () => new Date('2024-10-05');
+
+        // 学習データ（得点効率と重要度を考慮）
+        const initialStudyData = {
+            examName: "応用情報技術者試験",
+            examDate: "2024-10-12",
+            subjects: [
+                { 
+                    id: 1, 
+                    name: "基礎理論", 
+                    priority: "中", 
+                    difficulty: 3, 
+                    examWeight: 8, 
+                    weeks: 3,
+                    currentWeek: 3,
+                    status: "完了",
+                    description: "数学、論理演算など"
+                },
+                { 
+                    id: 2, 
+                    name: "アルゴリズムとプログラミング", 
+                    priority: "高", 
+                    difficulty: 4, 
+                    examWeight: 12, 
+                    weeks: 3,
+                    currentWeek: 1,
+                    status: "学習中",
+                    description: "データ構造、アルゴリズム設計"
+                },
+                { 
+                    id: 3, 
+                    name: "ハードウェアとコンピュータ構成要素", 
+                    priority: "中", 
+                    difficulty: 2, 
+                    examWeight: 8, 
+                    weeks: 3,
+                    currentWeek: 0,
+                    status: "未開始",
+                    description: "CPU、メモリ、入出力装置"
+                },
+                { 
+                    id: 4, 
+                    name: "システム構成要素", 
+                    priority: "中", 
+                    difficulty: 2, 
+                    examWeight: 6, 
+                    weeks: 3,
+                    currentWeek: 0,
+                    status: "未開始",
+                    description: "システム性能、可用性"
+                },
+                { 
+                    id: 5, 
+                    name: "ソフトウェア", 
+                    priority: "中", 
+                    difficulty: 3, 
+                    examWeight: 8, 
+                    weeks: 3,
+                    currentWeek: 0,
+                    status: "未開始",
+                    description: "OS、ミドルウェア、ファイルシステム"
+                },
+                { 
+                    id: 6, 
+                    name: "データベース", 
+                    priority: "高", 
+                    difficulty: 4, 
+                    examWeight: 15, 
+                    weeks: 3,
+                    currentWeek: 0,
+                    status: "未開始",
+                    description: "関係データベース、SQL、正規化"
+                },
+                { 
+                    id: 7, 
+                    name: "ネットワーク", 
+                    priority: "高", 
+                    difficulty: 3, 
+                    examWeight: 12, 
+                    weeks: 3,
+                    currentWeek: 0,
+                    status: "未開始",
+                    description: "TCP/IP、ルーティング、プロトコル"
+                },
+                { 
+                    id: 8, 
+                    name: "セキュリティ", 
+                    priority: "高", 
+                    difficulty: 3, 
+                    examWeight: 15, 
+                    weeks: 3,
+                    currentWeek: 0,
+                    status: "未開始",
+                    description: "暗号化、認証、情報セキュリティ対策"
+                },
+                { 
+                    id: 9, 
+                    name: "システム開発技術", 
+                    priority: "中", 
+                    difficulty: 2, 
+                    examWeight: 8, 
+                    weeks: 3,
+                    currentWeek: 0,
+                    status: "未開始",
+                    description: "開発プロセス、テスト手法"
+                },
+                { 
+                    id: 10, 
+                    name: "マネジメント", 
+                    priority: "低", 
+                    difficulty: 2, 
+                    examWeight: 4, 
+                    weeks: 3,
+                    currentWeek: 0,
+                    status: "未開始",
+                    description: "プロジェクト管理、品質管理"
+                },
+                { 
+                    id: 11, 
+                    name: "ストラテジ", 
+                    priority: "低", 
+                    difficulty: 2, 
+                    examWeight: 4, 
+                    weeks: 3,
+                    currentWeek: 0,
+                    status: "未開始",
+                    description: "経営戦略、システム戦略"
+                }
+            ]
+        };
+
+        // データの保存と読み込み
+        const saveData = (key, data) => {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (e) {
+                console.warn('データ保存に失敗しました:', e);
+            }
+        };
+
+        const loadData = (key, defaultValue) => {
+            try {
+                const saved = localStorage.getItem(key);
+                return saved ? JSON.parse(saved) : defaultValue;
+            } catch (e) {
+                console.warn('データ読み込みに失敗しました:', e);
+                return defaultValue;
+            }
+        };
+
+        // アプリケーション状態
+        let appState = {
+            subjects: loadData('studySubjects', initialStudyData.subjects),
+            filter: { priority: "", status: "" },
+            activeTimer: null,
+            timerStart: null,
+            elapsedTime: 0,
+            studyTimes: loadData('studyTimes', {})
+        };
+
+        // 日数計算
+        const daysUntilStudyEnd = Math.ceil((getStudyEndDate() - getCurrentDate()) / (1000 * 60 * 60 * 24));
+        const daysUntilExam = Math.ceil((getExamDate() - getCurrentDate()) / (1000 * 60 * 60 * 24));
+        const availableWeeks = Math.floor(daysUntilStudyEnd / 7);
+        const totalRequiredWeeks = 11 * 3;
+        const compressionRatio = availableWeeks / totalRequiredWeeks;
+
+        // 全体の進捗計算
+        const calculateOverallProgress = () => {
+            const totalWeeks = appState.subjects.length * 3;
+            const completedWeeks = appState.subjects.reduce((total, subject) => total + subject.currentWeek, 0);
+            return Math.round((completedWeeks / totalWeeks) * 100);
+        };
+
+        // 優先度別の科目数
+        const calculatePriorityDistribution = () => {
+            const distribution = { "高": 0, "中": 0, "低": 0 };
+            appState.subjects.forEach(subject => {
+                distribution[subject.priority]++;
+            });
+            return Object.entries(distribution).map(([priority, count]) => ({
+                name: priority,
+                value: count,
+                color: priority === "高" ? "#ef4444" : priority === "中" ? "#f59e0b" : "#22c55e"
+            }));
+        };
+
+        // 得点効率順のランキング
+        const calculateEfficiencyRanking = () => {
+            return [...appState.subjects]
+                .sort((a, b) => (b.examWeight / b.difficulty) - (a.examWeight / a.difficulty))
+                .slice(0, 5)
+                .map((subject, index) => ({
+                    ...subject,
+                    rank: index + 1,
+                    efficiency: Math.round((subject.examWeight / subject.difficulty) * 10) / 10
+                }));
+        };
+
+        // 学習スケジュール生成
+        const generateOptimizedSchedule = () => {
+            const schedule = [];
+            let currentWeek = 1;
+            
+            const subjectOrder = [
+                "基礎理論", "アルゴリズムとプログラミング", "ハードウェアとコンピュータ構成要素",
+                "システム構成要素", "ソフトウェア", "データベース", "ネットワーク", 
+                "セキュリティ", "システム開発技術", "マネジメント", "ストラテジ"
+            ];
+
+            const sortedSubjects = subjectOrder.map(subjectName => 
+                appState.subjects.find(s => s.name === subjectName)
+            ).filter(Boolean);
+
+            const phaseNames = ["インプット", "復習", "午後対策"];
+            const studyTimeWeights = [
+                0.7 * compressionRatio,
+                0.4 * compressionRatio,
+                0.8 * compressionRatio
+            ];
+
+            for (let phase = 1; phase <= 3; phase++) {
+                sortedSubjects.forEach(subject => {
+                    const baseHours = subject.examWeight * 2;
+                    const adjustedHours = Math.max(
+                        Math.round(baseHours * studyTimeWeights[phase - 1]),
+                        phase === 1 ? 4 : 2
+                    );
+                    
+                    const totalTasksNeeded = 33;
+                    const daysPerTask = Math.floor(daysUntilStudyEnd / totalTasksNeeded);
+                    const startDate = new Date(2024, 6, 25 + (currentWeek - 1) * daysPerTask);
+                    const endDate = new Date(2024, 6, 25 + currentWeek * daysPerTask - 1);
+                    
+                    const studyEndDate = getStudyEndDate();
+                    const actualEndDate = endDate > studyEndDate ? studyEndDate : endDate;
+                    
+                    const taskId = `${subject.name}-${phase}`;
+                    const actualStudyTime = appState.studyTimes[taskId] || 0;
+                    const remainingTime = Math.max(0, Math.min(adjustedHours, 35) - actualStudyTime);
+                    
+                    let status;
+                    if (subject.currentWeek > phase) {
+                        status = "完了";
+                    } else if (subject.currentWeek === phase) {
+                        status = actualEndDate < new Date() ? "完了" : "進行中";
+                    } else {
+                        status = startDate <= new Date() && new Date() <= actualEndDate ? "進行中" : "予定";
+                    }
+                    
+                    schedule.push({
+                        id: taskId,
+                        week: currentWeek,
+                        subject: subject.name,
+                        phase: `${phase}週目: ${phaseNames[phase - 1]}`,
+                        priority: subject.priority,
+                        studyHours: Math.min(adjustedHours, 35),
+                        actualStudyTime: actualStudyTime,
+                        remainingTime: remainingTime,
+                        originalHours: Math.round(baseHours * [1.0, 0.8, 1.2][phase - 1]),
+                        efficiency: Math.round((subject.examWeight / subject.difficulty) * 10) / 10,
+                        status: status,
+                        startDate: startDate.toLocaleDateString('ja-JP'),
+                        endDate: actualEndDate.toLocaleDateString('ja-JP'),
+                        compressionRatio: Math.round(studyTimeWeights[phase - 1] / [1.0, 0.8, 1.2][phase - 1] * 100)
+                    });
+                    currentWeek++;
+                });
+            }
+
+            return schedule;
+        };
+
+        // フィルタリング
+        const getFilteredSubjects = () => {
+            return appState.subjects.filter(subject => {
+                return (
+                    (appState.filter.priority === "" || subject.priority === appState.filter.priority) &&
+                    (appState.filter.status === "" || subject.status === appState.filter.status)
+                );
+            });
+        };
+
+        // 科目進捗更新
+        const updateSubjectProgress = (subjectId, newWeek) => {
+            appState.subjects = appState.subjects.map(subject => 
+                subject.id === subjectId 
+                    ? { 
+                        ...subject, 
+                        currentWeek: newWeek,
+                        status: newWeek === 0 ? "未開始" : newWeek >= 1 ? "完了" : "学習中"
+                    }
+                    : subject
+            );
+            saveData('studySubjects', appState.subjects);
+            renderApp();
+        };
+
+        // タイマー機能
+        const startTimer = (taskId) => {
+            if (appState.activeTimer === taskId) {
+                // タイマー停止
+                if (appState.timerStart) {
+                    const totalTime = Math.floor((Date.now() - appState.timerStart) / 60000);
+                    appState.studyTimes[taskId] = (appState.studyTimes[taskId] || 0) + totalTime/60;
+                    saveData('studyTimes', appState.studyTimes);
+                }
+                appState.activeTimer = null;
+                appState.timerStart = null;
+                appState.elapsedTime = 0;
+            } else {
+                // タイマー開始
+                appState.activeTimer = taskId;
+                appState.timerStart = Date.now();
+                appState.elapsedTime = 0;
+            }
+            renderApp();
+        };
+
+        const formatTime = (milliseconds) => {
+            const minutes = Math.floor(milliseconds / 60000);
+            const seconds = Math.floor((milliseconds % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        };
+
+        const formatHours = (hours) => {
+            return Math.round(hours * 10) / 10;
+        };
+
+        // データエクスポート/インポート
+        const exportData = () => {
+            const data = {
+                subjects: appState.subjects,
+                studyTimes: appState.studyTimes,
+                exportDate: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '学習進捗データ.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        const importData = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.subjects && data.studyTimes) {
+                            appState.subjects = data.subjects;
+                            appState.studyTimes = data.studyTimes;
+                            saveData('studySubjects', appState.subjects);
+                            saveData('studyTimes', appState.studyTimes);
+                            renderApp();
+                            alert('データを正常にインポートしました！');
+                        }
+                    } catch (error) {
+                        alert('データの読み込みに失敗しました。');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+
+        // アプリレンダリング
+        const renderApp = () => {
+            const overallProgress = calculateOverallProgress();
+            const priorityDistribution = calculatePriorityDistribution();
+            const efficiencyRanking = calculateEfficiencyRanking();
+            const optimizedSchedule = generateOptimizedSchedule();
+            const filteredSubjects = getFilteredSubjects();
+
+            document.getElementById('app').innerHTML = `
+                <div class="p-4 md:p-8">
+                    <!-- ヘッダー -->
+                    <div class="glass-effect rounded-2xl shadow-2xl p-6 md:p-8 mb-8 card-hover">
+                        <div class="flex items-center justify-between flex-wrap gap-4">
+                            <div>
+                                <h1 class="text-2xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center">
+                                    📚 ${initialStudyData.examName}
+                                </h1>
+                                <p class="text-slate-600 mt-3 text-sm md:text-base font-medium">
+                                    学習終了: <span class="text-emerald-600 font-semibold">2024年10月5日</span> (残り${daysUntilStudyEnd}日) | 
+                                    試験日: <span class="text-purple-600 font-semibold">${initialStudyData.examDate}</span> (残り${daysUntilExam}日)
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <div class="relative w-24 h-24 mx-auto">
+                                    <svg class="w-24 h-24 progress-ring" viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="40" stroke="#e5e7eb" stroke-width="8" fill="none"/>
+                                        <circle cx="50" cy="50" r="40" stroke="url(#progressGradient)" stroke-width="8" 
+                                                fill="none" stroke-linecap="round"
+                                                stroke-dasharray="${2 * Math.PI * 40}"
+                                                stroke-dashoffset="${2 * Math.PI * 40 * (1 - overallProgress/100)}"
+                                                style="transition: stroke-dashoffset 0.5s ease"/>
+                                        <defs>
+                                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" style="stop-color:#3b82f6"/>
+                                                <stop offset="100%" style="stop-color:#8b5cf6"/>
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">${overallProgress}%</div>
+                                            <div class="text-xs text-slate-500 font-medium">進捗</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- データ管理 -->
+                    <div class="glass-effect rounded-2xl shadow-xl p-6 mb-8 card-hover">
+                        <h3 class="font-bold text-slate-800 mb-4 flex items-center text-lg">
+                            <span class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mr-3">
+                                📊
+                            </span>
+                            データ管理
+                        </h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="exportData()" class="button-primary button-success text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293V6.5z"/>
+                                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                                </svg>
+                                エクスポート
+                            </button>
+                            <label class="button-primary text-white px-6 py-3 rounded-xl font-semibold text-sm cursor-pointer flex items-center gap-2 shadow-lg">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M7.5 5.5a.5.5 0 0 0-1 0v3.793L5.354 8.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L7.5 9.293V5.5z"/>
+                                    <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5z"/>
+                                </svg>
+                                インポート
+                                <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+                            </label>
+                            <button onclick="if(confirm('全てのデータをリセットしますか？')){localStorage.clear();location.reload();}" 
+                                    class="button-primary button-danger text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                </svg>
+                                リセット
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- フィルターコントロール -->
+                    <div class="glass-effect rounded-2xl shadow-xl p-6 mb-8 card-hover">
+                        <div class="flex flex-wrap gap-4">
+                            <select onchange="appState.filter.priority=this.value;renderApp()" 
+                                    class="px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium bg-white/90 backdrop-blur-sm">
+                                <option value="">🎯 全ての優先度</option>
+                                <option value="高" ${appState.filter.priority === "高" ? "selected" : ""}>🔴 高優先度</option>
+                                <option value="中" ${appState.filter.priority === "中" ? "selected" : ""}>🟡 中優先度</option>
+                                <option value="低" ${appState.filter.priority === "低" ? "selected" : ""}>🟢 低優先度</option>
+                            </select>
+                            
+                            <select onchange="appState.filter.status=this.value;renderApp()" 
+                                    class="px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium bg-white/90 backdrop-blur-sm">
+                                <option value="">📊 全てのステータス</option>
+                                <option value="完了" ${appState.filter.status === "完了" ? "selected" : ""}>✅ 完了</option>
+                                <option value="学習中" ${appState.filter.status === "学習中" ? "selected" : ""}>🔄 学習中</option>
+                                <option value="未開始" ${appState.filter.status === "未開始" ? "selected" : ""}>⏳ 未開始</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- キーメトリクス -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+                        <div class="metric-card rounded-2xl shadow-xl p-6 card-hover border border-white/30">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-semibold text-slate-700">完了科目数</h3>
+                                <div class="w-10 h-10 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center">
+                                    <span class="text-white text-lg">✅</span>
+                                </div>
+                            </div>
+                            <div class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-400 bg-clip-text text-transparent mb-1">
+                                ${appState.subjects.filter(s => s.status === "完了").length}
+                            </div>
+                            <div class="text-sm text-slate-500 font-medium">/ ${appState.subjects.length} 科目</div>
+                        </div>
+
+                        <div class="metric-card rounded-2xl shadow-xl p-6 card-hover border border-white/30">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-semibold text-slate-700">学習中科目数</h3>
+                                <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-xl flex items-center justify-center">
+                                    <span class="text-white text-lg">🎯</span>
+                                </div>
+                            </div>
+                            <div class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-1">
+                                ${appState.subjects.filter(s => s.status === "学習中").length}
+                            </div>
+                            <div class="text-sm text-slate-500 font-medium">進行中</div>
+                        </div>
+
+                        <div class="metric-card rounded-2xl shadow-xl p-6 card-hover border border-white/30">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-semibold text-slate-700">高優先度科目</h3>
+                                <div class="w-10 h-10 bg-gradient-to-r from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
+                                    <span class="text-white text-lg">⚡</span>
+                                </div>
+                            </div>
+                            <div class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent mb-1">
+                                ${appState.subjects.filter(s => s.priority === "高").length}
+                            </div>
+                            <div class="text-sm text-slate-500 font-medium">重点科目</div>
+                        </div>
+
+                        <div class="metric-card rounded-2xl shadow-xl p-6 card-hover border border-white/30">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-semibold text-slate-700">学習終了まで</h3>
+                                <div class="w-10 h-10 bg-gradient-to-r from-purple-400 to-purple-600 rounded-xl flex items-center justify-center">
+                                    <span class="text-white text-lg">⏰</span>
+                                </div>
+                            </div>
+                            <div class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent mb-1">${daysUntilStudyEnd}</div>
+                            <div class="text-sm text-slate-500 font-medium">日（10月5日まで）</div>
+                        </div>
+                    </div>
+
+                    <!-- 得点効率ランキング -->
+                    <div class="glass-effect rounded-2xl shadow-2xl p-6 mb-8 card-hover">
+                        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-xl flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">📈</span>
+                            </div>
+                            得点効率ランキング TOP5
+                        </h2>
+                        <div class="space-y-4">
+                            ${efficiencyRanking.map(subject => `
+                                <div class="glass-effect rounded-xl p-4 card-hover border border-white/20">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                                                <span class="text-white font-bold text-lg">${subject.rank}</span>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-semibold text-slate-800 text-sm md:text-base">${subject.name}</h4>
+                                                <p class="text-xs md:text-sm text-slate-500">配点: <span class="font-medium">${subject.examWeight}%</span> / 難易度: <span class="font-medium">${subject.difficulty}</span></p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">${subject.efficiency}</div>
+                                            <div class="text-xs text-slate-500 font-medium">効率値</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- 学習スケジュール -->
+                    <div class="glass-effect rounded-2xl shadow-2xl p-6 mb-8 card-hover">
+                        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-r from-indigo-400 to-purple-600 rounded-xl flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">📅</span>
+                            </div>
+                            学習スケジュール
+                        </h2>
+                        
+                        <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+                            <h3 class="font-bold text-blue-800 mb-3 flex items-center">
+                                <span class="mr-2">⏰</span> 学習時間圧縮システム
+                            </h3>
+                            <div class="text-sm text-blue-700 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <p>• <span class="font-semibold">利用可能週数:</span> ${availableWeeks}週 / 標準: ${totalRequiredWeeks}週</p>
+                                <p>• <span class="font-semibold">圧縮率:</span> ${Math.round(compressionRatio * 100)}% - 効率化学習</p>
+                                <p>• <span class="font-semibold">全科目実施:</span> 3フェーズ完全実行</p>
+                                <p>• <span class="font-semibold">週間上限:</span> 35時間（無理のないペース）</p>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto table-modern">
+                            <table class="w-full text-xs md:text-sm bg-white/95">
+                                <thead class="bg-gradient-to-r from-slate-50 to-slate-100">
+                                    <tr class="border-b border-slate-200">
+                                        <th class="text-left py-4 px-3 font-semibold text-slate-700">週</th>
+                                        <th class="text-left py-4 px-3 font-semibold text-slate-700">科目</th>
+                                        <th class="text-left py-4 px-3 font-semibold text-slate-700">フェーズ</th>
+                                        <th class="text-left py-4 px-3 font-semibold text-slate-700">タイマー</th>
+                                        <th class="text-left py-4 px-3 font-semibold text-slate-700">進捗</th>
+                                        <th class="text-left py-4 px-3 font-semibold text-slate-700">残り</th>
+                                        <th class="text-left py-4 px-3 font-semibold text-slate-700">目標</th>
+                                        <th class="text-left py-4 px-3 font-semibold text-slate-700">優先度</th>
+                                        <th class="text-left py-4 px-3 font-semibold text-slate-700">期間</th>
+                                        <th class="text-left py-4 px-3 font-semibold text-slate-700">状態</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${optimizedSchedule.map((item, index) => `
+                                        <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors ${
+                                            item.status === "完了" ? "bg-emerald-50/50" : 
+                                            item.status === "進行中" ? "bg-blue-50/50" : ""
+                                        }">
+                                            <td class="py-4 px-3 font-bold text-slate-700">${item.week}</td>
+                                            <td class="py-4 px-3 font-medium text-slate-800">${item.subject}</td>
+                                            <td class="py-4 px-3 text-slate-600">${item.phase}</td>
+                                            <td class="py-4 px-3">
+                                                <div class="flex flex-col items-center gap-2">
+                                                    <button
+                                                        onclick="startTimer('${item.id}')"
+                                                        class="px-3 py-2 rounded-xl font-semibold text-xs transition-all shadow-lg ${
+                                                            appState.activeTimer === item.id 
+                                                                ? "bg-gradient-to-r from-red-500 to-red-600 text-white animate-pulse-soft" 
+                                                                : "bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-xl hover:scale-105"
+                                                        }"
+                                                        ${item.status === "完了" ? "disabled opacity-50" : ""}
+                                                    >
+                                                        ${appState.activeTimer === item.id ? "⏹ 停止" : "▶ 開始"}
+                                                    </button>
+                                                    ${appState.activeTimer === item.id ? `
+                                                        <div class="timer-display">
+                                                            ${formatTime(appState.elapsedTime)}
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
+                                            </td>
+                                            <td class="py-4 px-3 font-bold text-blue-600">
+                                                ${formatHours(item.actualStudyTime)}h
+                                            </td>
+                                            <td class="py-4 px-3 font-bold text-orange-500">
+                                                ${formatHours(item.remainingTime)}h
+                                            </td>
+                                            <td class="py-4 px-3 font-bold text-purple-600">${item.studyHours}h</td>
+                                            <td class="py-4 px-3">
+                                                <span class="status-badge ${
+                                                    item.priority === "高" ? "priority-high" :
+                                                    item.priority === "中" ? "priority-medium" :
+                                                    "priority-low"
+                                                }">
+                                                    ${item.priority}
+                                                </span>
+                                            </td>
+                                            <td class="py-4 px-3 text-slate-500 text-xs">${item.startDate}<br>${item.endDate}</td>
+                                            <td class="py-4 px-3">
+                                                <span class="status-badge ${
+                                                    item.status === "完了" ? "bg-emerald-100 text-emerald-800" :
+                                                    item.status === "進行中" ? "bg-blue-100 text-blue-800" :
+                                                    "bg-slate-100 text-slate-600"
+                                                }">
+                                                    ${item.status === "完了" ? "✅ 完了" : 
+                                                      item.status === "進行中" ? "🔄 進行中" : "⏳ 予定"}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-6 p-6 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl">
+                            <h3 class="font-bold text-emerald-800 flex items-center mb-3">
+                                <span class="mr-2">📅</span> 学習スケジュール概要
+                            </h3>
+                            <div class="text-sm text-emerald-700 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <p><span class="font-semibold">全学習完了:</span> 2024年10月5日</p>
+                                    <p><span class="font-semibold">総学習タスク:</span> ${optimizedSchedule.length}個</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p><span class="font-semibold">試験日:</span> 2024年10月12日</p>
+                                    <p><span class="font-semibold">最終復習期間:</span> 1週間確保</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 科目別詳細 -->
+                    <div class="glass-effect rounded-2xl shadow-2xl p-6 card-hover">
+                        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mr-3">
+                                <span class="text-white text-lg">📚</span>
+                            </div>
+                            科目別学習状況
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${filteredSubjects.map(subject => `
+                                <div class="subject-card rounded-xl p-6 shadow-lg">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3 class="font-bold text-slate-800 text-sm md:text-base leading-tight">${subject.name}</h3>
+                                        <span class="status-badge ${
+                                            subject.priority === "高" ? "priority-high" :
+                                            subject.priority === "中" ? "priority-medium" :
+                                            "priority-low"
+                                        }">
+                                            ${subject.priority}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs md:text-sm text-slate-600 mb-4 leading-relaxed">${subject.description}</p>
+                                    <div class="flex items-center justify-between text-sm text-slate-500 mb-4">
+                                        <span class="font-medium">配点: <span class="text-blue-600">${subject.examWeight}%</span></span>
+                                        <span class="font-medium">難易度: <span class="text-orange-500">${subject.difficulty}/5</span></span>
+                                    </div>
+                                    <div class="mb-4">
+                                        <div class="flex justify-between text-sm font-medium mb-2">
+                                            <span class="text-slate-600">学習進捗</span>
+                                            <span class="text-blue-600">${Math.round((subject.currentWeek / 3) * 100)}%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                                            <div 
+                                                class="progress-bar h-3 transition-all duration-500 ease-out"
+                                                style="width: ${(subject.currentWeek / 3) * 100}%"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        ${[1, 2, 3].map(week => `
+                                            <button
+                                                onclick="updateSubjectProgress(${subject.id}, ${week})"
+                                                class="flex-1 py-3 px-3 text-xs font-semibold rounded-xl transition-all duration-200 ${
+                                                    subject.currentWeek >= week 
+                                                        ? "bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg" 
+                                                        : "bg-slate-200 text-slate-600 hover:bg-slate-300 hover:shadow-md"
+                                                }"
+                                            >
+                                                ${week === 1 ? "✅ 完了" : `${week}週目`}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        // タイマー更新
+        const updateTimer = () => {
+            if (appState.activeTimer && appState.timerStart) {
+                appState.elapsedTime = Date.now() - appState.timerStart;
+                renderApp();
+            }
+        };
+
+        // 初期レンダリング
+        renderApp();
+
+        // タイマー更新を1秒ごとに実行
+        setInterval(updateTimer, 1000);
+
+        // グローバル関数として定義（HTMLから呼び出すため）
+        window.updateSubjectProgress = updateSubjectProgress;
+        window.startTimer = startTimer;
+        window.exportData = exportData;
+        window.importData = importData;
+    </script>
+</body>
+</html>
